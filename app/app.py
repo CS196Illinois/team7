@@ -23,4 +23,4 @@ def results():
         pred = model.predict()
         return render_template('result.html')
 
-app.run("localhost", "9999", debug=True)
+app.run("localhost", 9999, debug=True)
