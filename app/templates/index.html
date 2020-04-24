@@ -101,14 +101,29 @@ h1 {
 	<div class="frame">
 	<div class="center">
 		<div class="title">
-			<h1> Drop Image To Upload </h1>
+			<h1> Drop Image/Video To Upload </h1>
+            <h6> Your file must be less than 100 MB </h6>
 		</div>
         <form action = "http://localhost:9999/" method = "POST"
          enctype = "multipart/form-data">
-         <input type = "file" name = "img" accept="image/*"/>
-         <input type = "submit"/>
+
+         <input type = "file" id = "img" name = "img"/>
+         <!-- Script -->
+        <script src='http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.js'></script>
+        <script type="text/javascript">
+        $('#img').on('change', function() {
+            const size = (this.files[0].size / 1024 / 1024).toFixed(2); // MB
+
+            if (size > 100) {
+                alert("File must be less than 100 MB");
+                $('#img').val('');
+            }
+        });
+        </script>
+        <input type = "submit"/>
       </form>
 	</div>
 </div>
 
 </body></html>
+
