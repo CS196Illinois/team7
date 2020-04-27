@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import tensorflow as tf
-# YOU NEED TF 2.1 and PROTOBUF 3.11!!!
+# YOU NEED TF 2.1.0 and PROTOBUF 3.11.3!!!
 import os
 
 app = Flask('image_optimizer')
