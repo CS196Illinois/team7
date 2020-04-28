@@ -7,7 +7,7 @@ app = Flask('image_optimizer')
 
 
 def get_model():
-    model = tf.keras.models.load_model('model42604.h5')
+    model = tf.keras.models.load_model('model_ver2.h5')
     return model
 
 
