@@ -1,24 +1,9 @@
 from flask import Flask, render_template, request
-import tensorflow as tf
+from app import optimizer
 # YOU NEED TF 2.1.0 and PROTOBUF 3.11.3!!!
 import os
 
 app = Flask('image_optimizer')
-
-
-def get_model():
-    model = tf.keras.models.load_model('model_ver2.h5')
-    return model
-
-
-def run_model(model, files):
-    augmented_images = model.augment(files)
-    scores = model.calculate_socres(augmented_images)  # list or a dict
-    image_scores = {}
-    for index in range(scores.len):
-        image_scores.update({augmented_images.get(index): scores[index]})
-
-    return image_scores
 
 
 @app.route('/')
@@ -31,8 +16,8 @@ def results():
     print(request.files)
     if request.method == 'POST':
         # write your function that loads the model
-        model = get_model()  # you can use pickle to load the trained model
-
+        # model = get_model()  # you can use pickle to load the trained model
+        best_images = optimizer.run(request.files)
         # year = request.form['year']
         # pred = model.predict()
         # image_scores = run_model(model, request.files)
