@@ -13,14 +13,14 @@ def show_index():
 
 @app.route('/', methods=['POST'])
 def results():
-    print(request.files)
+    print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
         # model = get_model()  # you can use pickle to load the trained model
         # year = request.form['year']
         # pred = model.predict()
 
-        best_images = optimizer.run(request.files)
+        best_images = optimizer.run(request.files.getlist('img'))
         return render_template('result.html', pred=123)
 
 
