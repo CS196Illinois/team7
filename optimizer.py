@@ -11,7 +11,7 @@ def run(images):
 
 
 def get_model():
-    model = tf.keras.models.load_model('model_ver2.h5')
+    model = tf.keras.models.load_model('app/model_ver2.h5')
     return model
 
 
@@ -29,6 +29,7 @@ def run_model(model, files):
 # resizes images and does whatever else a preprocessor is supposed to do
 def run_preprocessor(images):
     processed_images = {}
+
     for img_path in images:
         image = Image.open(img_path)
         image = image.resize((200, 200))

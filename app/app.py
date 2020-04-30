@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
-from app import optimizer
+import optimizer
+
 # YOU NEED TF 2.1.0 and PROTOBUF 3.11.3!!!
-import os
 
 app = Flask('image_optimizer')
 
@@ -17,10 +17,10 @@ def results():
     if request.method == 'POST':
         # write your function that loads the model
         # model = get_model()  # you can use pickle to load the trained model
-        best_images = optimizer.run(request.files)
         # year = request.form['year']
         # pred = model.predict()
-        # image_scores = run_model(model, request.files)
+
+        best_images = optimizer.run(request.files)
         return render_template('result.html', pred=123)
 
 
