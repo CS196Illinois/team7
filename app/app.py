@@ -56,7 +56,6 @@ def run_model(model, files):
 
     return image_scores
 
-
 @app.route('/')
 def show_index():
     return render_template('index.html')
@@ -64,7 +63,7 @@ def show_index():
 
 @app.route('/', methods=['POST'])
 def results():
-    print(request.files)
+    print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
         model = get_model() # you can use pickle to load the trained model
