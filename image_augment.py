@@ -8,50 +8,52 @@ class ImageAugment():
         self.image_hsv = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2HSV)
         self.image_rgb = image_rgb
 
-
-
-    def adjust_brightness(self, alpha):
-        assert alpha<0 and alpha>1
-        brighter_lab = np.add(self.image_lab[:, :, 0], (1 - self.image_lab[:, :, 0])*alpha)
-        return cv2.cvtColor(brighter_lab, cv2.COLOR_LAB2RGB)
-
-    def adjust_brightness_gamma(self, gamma):
+    def adjust_brightness(self, gamma):
+        # <1 means brighter, >1 means darker
+        # For reference you probably want the range [.5, 5]
         LUT  = np.array([((i / 255.0) ** gamma) * 255
             for i in np.arange(0, 256)]).astype("uint8")
         return cv2.LUT(self.image_rgb, LUT)
 
-    def adjust_contrast(self, alpha=2, beta=8):
-        clahe = cv2.createCLAHE(clipLimit=alpha, tileGridSize=(beta,beta))
-        return clahe.apply(self.image_rgb)
+    def adjust_contrast(self, alpha=3, beta=6):
+        lab = self.image_lab
+        clahe = cv2.createCLAHE(clipLimit=alpha, tileGridSize=(beta, beta))
+        l = lab[:,:,0]
+        lab[:,:,0] = clahe.apply(l)
+        RGB = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
+        return RGB
 
     def adjust_saturation(self, alpha):
         temp_hsv = self.image_hsv.astype('float32')
         (h, s, v) = cv2.split(temp_hsv)
-        s=s*alpha
+        s=s+(255-s)*alpha
         s=np.clip(s, 0, 255)
         imghsv = cv2.merge([h,s,v])
-        imghsv = imghsv.astpye('uint8')
+        imghsv = cv2.cvtColor(imghsv.astype('uint8'), cv2.COLOR_HSV2RGB)
         return imghsv
 
-    def adjust_sharpness(self, alpha, beta=5):
+    def adjust_sharpness(self, alpha):
         # alpha is the amount of blurriness you add. MUST be negative to sharpen. 0 does nothing, positive to blur
-        blur = cv2.GaussianBlur(self.image_rgb, (1, 1), beta)
-        return cv2.addWeighted(self.image_rgb, 1, blur, alpha)
+        blur = cv2.blur(self.image_rgb, (5, 5))
+        return cv2.addWeighted(self.image_rgb, 1, blur, alpha, 5)
 
-    def adjust_blur(self, alpha, beta=5):
-        return self.adjust_sharpness(alpha, beta)
 
     def adjust_warmth(self, alpha, cool=False):
         (r, g, b) = cv2.split(self.image_rgb)
         increaseLUT = np.array([i + (255 - i) * alpha for i in np.arange(0, 256)])
         decreaseLUT = np.array([i * alpha for i in np.arange(0, 256)])
-        if cool:
+        if not cool:
             r = cv2.LUT(r, decreaseLUT)
             b = cv2.LUT(b, increaseLUT)
         else:
             r = cv2.LUT(r, increaseLUT)
             b = cv2.LUT(b, decreaseLUT)
-        return cv2.merge([r,g,b])
+        image_new = np.zeros_like(self.image_rgb)
+        image_new[:,:,0] = r
+        image_new[:, :, 1] = g
+        image_new[:, :, 2] = b
+
+        return image_new
 
     def adjust_cool(self, alpha, cool=True):
         self.adjust_warmth(alpha, cool)
