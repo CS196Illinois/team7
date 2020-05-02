@@ -5,7 +5,7 @@ from PIL import Image
 import tensorflow as tf
 import base64
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import optimizer
 
 # YOU NEED TF 2.1.0, CV2 4.2.0.34, and PROTOBUF 3.11.3!!!
@@ -14,7 +14,8 @@ from image_augment import ImageAugment
 
 app = Flask('image_optimizer')
 
-
+UPLOAD_FOLDER = r'E:\Projects\team7\app'
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 def get_model():
     model = tf.keras.models.load_model('model_ver2.h5')
     return model
@@ -31,16 +32,21 @@ def get_images(files):
     """converts request.files to an array of PIL images"""
     arr = []
     for key, value in files.items():
-        filestr = value.read()
-        npimg = np.fromstring(filestr, np.uint8)
-        image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-        arr.append(image)
-        return arr
+        value.save("./uploads/"+str(value.filename))
 
+        # filestr = value.read()
+        # npimg = np.fromstring(filestr, np.uint8)
+        # image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        # arr.append(image)
+        arr.append("./uploads/"+str(value.filename))
+        return arr # TODO remove me
+    return arr
 
 def create_tensor(images):
     """converts an array of PIL images to a single
     4D tensor that is ready to be handled directly by the model"""
+    return cv2.imread(images[0]) # TODO remove me
+
     tensor = []
     boxes = []
     for image in images:
@@ -56,7 +62,7 @@ def create_tensor(images):
         row = [y1, x1, y2, x2]
         boxes.append(row)
     boxes_ind = range(len(tensor))
-    crop_size = [200, 200]
+    crop_size = [150, 150]
     return tf.image.crop_and_resize(tensor, boxes, boxes_ind, crop_size)
 
 
@@ -85,19 +91,24 @@ def save_images(images):
 def show_index():
     return render_template('index.html')
 
+@app.route('/uploads/<filename>')
+def send_file(filename):
+    return send_from_directory(r'E:\Projects\team7\app\uploads', filename)
+
 
 @app.route('/', methods=['POST'])
 def results():
     print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
-        model = get_model()  # you can use pickle to load the trained model
+        # model = get_model()  # you can use pickle to load the trained model
         images = get_images(request.files)
         tensor = create_tensor(images)
-        images = save_images(tensor) # augmentation hasn't run yet this won't run the model
+        #images = save_images(tensor) # augmentation hasn't run yet this won't run the model
         # year = request.form['year']
         # pred = model.predict()
-        
+
+        print(images)
         return render_template('result.html', images=images)  # returns nothing useful for now
 
 
