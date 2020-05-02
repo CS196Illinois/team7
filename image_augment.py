@@ -4,6 +4,7 @@ import numpy as np
 
 class ImageAugment():
     def __init__(self, image_rgb):
+        image_rgb = np.array(image_rgb)
         self.image_lab = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2LAB)
         self.image_hsv = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2HSV)
         self.image_rgb = image_rgb
@@ -58,3 +59,17 @@ class ImageAugment():
     def adjust_cool(self, alpha, cool=True):
         self.adjust_warmth(alpha, cool)
 
+    def augment(self):
+        images = []
+        images.append(self.adjust_brightness(.7))
+        images.append(self.adjust_brightness(2))
+        images.append(self.adjust_contrast(alpha=2, beta=3))
+        images.append(self.adjust_saturation(.3))
+        images.append(self.adjust_saturation(-.3))
+        images.append(self.adjust_sharpness(.4))
+        images.append(self.adjust_sharpness(-.4))
+        images.append(self.adjust_warmth(.0001))
+        images.append(self.adjust_cool(.000001))
+        return images
+        
+        
