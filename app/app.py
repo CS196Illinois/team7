@@ -16,23 +16,15 @@ app = Flask('image_optimizer')
 
 
 def get_model():
-    model = tf.keras.models.load_model('/Users/ishita/team7/app/model_ver2.h5')
+    model = tf.keras.models.load_model('model_ver2.h5')
     return model
 
 
-# THIS FUNCTION USES PLACEHOLDERS: don't expect this to work right now
 def run_model(model, files):
+    # calls the augmenter
     for image in files:
         augmenter = ImageAugment(image)
-        augmenter.augment()
-
-    augmented_images = model.augment(files)
-    scores = model.calculate_socres(augmented_images)  # list or a dict
-    best_images = {}
-    for index in range(scores.len):
-        best_images.update({augmented_images.get(index): scores[index]})
-
-    return best_images
+        # augmenter.augment()
 
 
 def get_images(files):
@@ -99,7 +91,10 @@ def results():
     print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
-        images = optimizer.run(request.files)
+        model = get_model()  # you can use pickle to load the trained model
+        images = get_images(request.files)
+        tensor = create_tensor(images)
+        images = save_images(tensor) # augmentation hasn't run yet this won't run the model
         # year = request.form['year']
         # pred = model.predict()
         
