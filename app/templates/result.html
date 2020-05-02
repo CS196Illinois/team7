@@ -101,11 +101,9 @@ h1 {
 	<div class="frame">
 	<div class="center">
 		<div class="title">
-            {% if pred %}
-			    <h1> {{ pred }}</h1>
-            {% else %}
-                <h1> Not found </h1>
-            {% endif %}
+            {% for image in images %}
+                <img src="{{ image }}"/>
+            {% endfor %}
 		</div>
 	</div>
 </div>
