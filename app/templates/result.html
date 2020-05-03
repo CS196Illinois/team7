@@ -21,11 +21,11 @@
 
 .center {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 300px;
-	height: 260px;
+	top: 75%;
+	left: 75%;
+	transform: translate(-75%, -75%);
+	width: 75%;
+	height: 75%;
 	border-radius: 3px;
 	box-shadow: 8px 10px 15px 0 rgba(0, 0, 0, 0.3);
 	background: #fff;
@@ -102,7 +102,7 @@ h1 {
 	<div class="center">
 		<div class="title">
             {% for image in images %}
-                <img src={{ image }}/>
+                <img src={{ image }} alt="image" width="150" height="150">
             {% endfor %}
 		</div>
 	</div>

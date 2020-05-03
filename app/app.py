@@ -11,12 +11,12 @@ from image_augment import ImageAugment
 
 app = Flask('image_optimizer')
 
-UPLOAD_FOLDER = r'E:\Projects\team7\app'
+UPLOAD_FOLDER = r'/Users/ishita/team7/app/uploads'
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 def get_model():
-    model = tf.keras.models.load_model('model_pruned_final.h5')
+    model = tf.keras.models.load_model('model_ver2.h5')
     return model
 
 
@@ -85,7 +85,7 @@ def run_model(image_paths, model):
 def fetch_best_images(paths, scores):
     image_dicts = []
     for index in range(len(paths)):
-        image_dicts.append({'path': paths[index], 'score': scores[index]})
+        image_dicts.append({'path': '.' + paths[index], 'score': scores[index]})
 
     # top 5 images:
     sorted_dict = sorted(image_dicts, key=lambda i: i['score'], reverse=True)
@@ -102,12 +102,11 @@ def show_index():
 
 @app.route('/uploads/<filename>')
 def send_file(filename):
-    return send_from_directory(r'E:\Projects\team7\app\uploads', filename)
+    return send_from_directory(r'/Users/ishita/team7/app/uploads', filename)
 
 
 @app.route('/', methods=['POST'])
 def results():
-    print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
         model = get_model()
