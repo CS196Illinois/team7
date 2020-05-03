@@ -26,11 +26,6 @@ def get_images(files):
     arr = []
     for key, value in files.items():
         value.save("./uploads/"+str(value.filename))
-
-        # filestr = value.read()
-        # npimg = np.fromstring(filestr, np.uint8)
-        # image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-        # arr.append(image)
         arr.append("./uploads/"+str(value.filename))
     return arr
 
@@ -56,7 +51,7 @@ def create_tensor(numpy_images):
     return tf.image.crop_and_resize(tensor, boxes, boxes_ind, crop_size)
 
 
-# (points 2, 4, 6, 7); Returns a list of image paths
+# Returns a list of image paths
 def run_model(image_paths, model):
     image_list = []
     paths = []
@@ -75,7 +70,7 @@ def run_model(image_paths, model):
         image_list.append(np.array(image))
         image_list.extend(augmented_images)
 
-    # this line is a mess, feel free to break it down into multiple lines for readability
+    
     scores = model.predict_on_batch(create_tensor(np.asarray(image_list))).numpy()
 
     return fetch_best_images(paths, scores)
@@ -108,7 +103,7 @@ def send_file(filename):
 @app.route('/', methods=['POST'])
 def results():
     if request.method == 'POST':
-        # write your function that loads the model
+        # called when user hits submit
         model = get_model()
         image_paths = get_images(request.files)
         top5 = run_model(image_paths, model)
