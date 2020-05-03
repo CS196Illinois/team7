@@ -1,13 +1,16 @@
 
 import cv2
 import numpy as np
+from PIL import Image
 
 class ImageAugment():
-    def __init__(self, image_rgb):
+    def __init__(self, image_rgb, filename):
         image_rgb = np.array(image_rgb)
         self.image_lab = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2LAB)
         self.image_hsv = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2HSV)
         self.image_rgb = image_rgb
+        self.filename = filename
+        self.paths = []
 
     def adjust_brightness(self, gamma):
         # <1 means brighter, >1 means darker
@@ -63,6 +66,22 @@ class ImageAugment():
         images = [self.adjust_brightness(.7), self.adjust_brightness(2), self.adjust_contrast(alpha=2, beta=3),
                   self.adjust_saturation(.3), self.adjust_saturation(-.3), self.adjust_sharpness(.4),
                   self.adjust_sharpness(-.4), self.adjust_warmth(.0001), self.adjust_cool(.000001)]
+        self.save_images(images)
         return images
+
+    def save_images(self, images):
+        for index in range(len(images)):
+            pil = Image.fromarray(images[index])
+            filename = str(self.filename)
+            filename = filename[:filename.rfind("/")]
+            filename = filename[:filename.rfind("/")]  # substring after second to last occurance of '/'
+            path = "./uploads/"+filename[:filename.rfind(".")]+"_"+str(index)+".png"
+            self.paths.append(path)
+            pil.save(path)
+
+    def get_paths(self):
+        return self.paths
+        
+        
         
         

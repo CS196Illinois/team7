@@ -6,10 +6,11 @@ import tensorflow as tf
 import base64
 import os
 from flask import Flask, render_template, request, send_from_directory
-import optimizer
+#import optimizer
 
 # YOU NEED TF 2.1.0, CV2 4.2.0.34, and PROTOBUF 3.11.3!!!
 # You also need pillow and opencv-python
+# RUN IT INSIDE APP DIRECTORY
 from image_augment import ImageAugment
 
 app = Flask('image_optimizer')
@@ -19,13 +20,13 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 def get_model():
-    model = tf.keras.models.load_model('model_ver2.h5')
+    model = tf.keras.models.load_model('model_pruned_final.h5')
     return model
 
 
 # returns a list of image paths (original images)
 def get_images(files):
-    """converts request.files to an array of PIL images"""
+    """converts request.files to an array of image paths"""
     arr = []
     for key, value in files.items():
         value.save("./uploads/"+str(value.filename))
@@ -63,15 +64,19 @@ def create_tensor(numpy_images):
 # (points 2, 4, 6, 7)
 def run_model(image_paths, model):
     image_list = []
+    paths = []
     for path in image_paths:
         image = Image.open(path)
         # add in the original image
         image_list.append(np.array(image))
 
-        augmenter = ImageAugment(image)
+        augmenter = ImageAugment(image, path)
         augmented_images = augmenter.augment()
+        augmented_paths = augmenter.get_paths()
 
-        # TODO: Call function to save augmented numpy images here
+        # add to paths
+        paths.append(path)
+        paths.append(augmented_paths)
 
         # add in the augmented images
         for aug_img in augmented_images:
@@ -79,7 +84,6 @@ def run_model(image_paths, model):
 
     scores = model.predict_on_batch(image_list)
 
-    paths = [] # PLACEHOLDER
     return generate_dict(paths, image_list, scores)
 
 
@@ -135,15 +139,14 @@ def results():
     print(request.files.getlist('img'))
     if request.method == 'POST':
         # write your function that loads the model
-        # model = get_model()  # you can use pickle to load the trained model
-        images = get_images(request.files)
-        tensor = create_tensor(images)
+        model = get_model()  # you can use pickle to load the trained model
+        image_paths = get_images(request.files)
+        top5 = run_model(image_paths, model)
+        # tensor = create_tensor(images)
         #images = save_images(tensor) # augmentation hasn't run yet this won't run the model
         # year = request.form['year']
         # pred = model.predict()
-
-        print(images)
-        return render_template('result.html', images=images)  # returns nothing useful for now
+        return render_template('result.html', pred=123)  # returns nothing useful for now
 
 
 app.run("localhost", 9999, debug=True)
