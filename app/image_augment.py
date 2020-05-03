@@ -1,4 +1,4 @@
-
+import ntpath
 import cv2
 import numpy as np
 from PIL import Image
@@ -41,7 +41,6 @@ class ImageAugment():
         blur = cv2.blur(self.image_rgb, (5, 5))
         return cv2.addWeighted(self.image_rgb, 1, blur, alpha, 5)
 
-
     def adjust_warmth(self, alpha, cool=False):
         (r, g, b) = cv2.split(self.image_rgb)
         increaseLUT = np.array([i + (255 - i) * alpha for i in np.arange(0, 256)])
@@ -60,7 +59,7 @@ class ImageAugment():
         return image_new
 
     def adjust_cool(self, alpha, cool=True):
-        self.adjust_warmth(alpha, cool)
+        return self.adjust_warmth(alpha, cool)
 
     def augment(self):
         images = [self.adjust_brightness(.7), self.adjust_brightness(2), self.adjust_contrast(alpha=2, beta=3),
@@ -72,10 +71,10 @@ class ImageAugment():
     def save_images(self, images):
         for index in range(len(images)):
             pil = Image.fromarray(images[index])
-            filename = str(self.filename)
-            filename = filename[:filename.rfind("/")]
-            filename = filename[:filename.rfind("/")]  # substring after second to last occurance of '/'
-            path = "./uploads/"+filename[:filename.rfind(".")]+"_"+str(index)+".png"
+
+            # basename gets the filename; splitext separates the extension from the filename
+            filename = ntpath.splitext(ntpath.basename(self.filename))[0]
+            path = "./uploads/" + filename + "_" + str(index) + ".png"
             self.paths.append(path)
             pil.save(path)
 

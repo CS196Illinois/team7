@@ -40,7 +40,7 @@ def get_images(files):
 
 
 def create_tensor(numpy_images):
-    """converts an array of PIL images to a single
+    """converts an array of numpy images to a single
     4D tensor that is ready to be handled directly by the model"""
     tensor = []
     boxes = []
@@ -67,8 +67,6 @@ def run_model(image_paths, model):
     paths = []
     for path in image_paths:
         image = Image.open(path)
-        # add in the original image
-        image_list.append(np.array(image))
 
         augmenter = ImageAugment(image, path)
         augmented_images = augmenter.augment()
@@ -76,18 +74,18 @@ def run_model(image_paths, model):
 
         # add to paths
         paths.append(path)
-        paths.append(augmented_paths)
+        paths.extend(augmented_paths)
 
-        # add in the augmented images
-        for aug_img in augmented_images:
-            image_list.append(aug_img)
+        # add to images
+        image_list.append(np.array(image))
+        image_list.extend(augmented_images)
 
-    scores = model.predict_on_batch(image_list)
+    # this line is a mess, feel free to break it down into multiple lines for readability
+    scores = model.predict_on_batch(create_tensor(np.asarray(image_list)))
 
     return generate_dict(paths, image_list, scores)
 
 
-# we have the
 def generate_dict(paths, arrays, scores):
     image_dicts = []
     for index in range(len(paths)):
