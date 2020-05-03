@@ -1,18 +1,14 @@
-from flask import Flask, render_template, request, send_from_directory
 import numpy as np
 from PIL import Image
 import tensorflow as tf
 
-from image_augment import ImageAugment
+from app.image_augment import ImageAugment
 
-# YOU NEED TF 2.1.0, CV2 4.2.0.34, and PROTOBUF 3.11.3!!!
-# You also need pillow and opencv-python
-# RUN IT INSIDE APP DIRECTORY
 
-app = Flask('image_optimizer')
-
-UPLOAD_FOLDER = r'E:\Projects\team7\app'
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+def run(images):
+    model = get_model()
+    image_paths = get_images(images)
+    return run_model(image_paths, model)
 
 
 def get_model():
@@ -56,7 +52,7 @@ def create_tensor(numpy_images):
     return tf.image.crop_and_resize(tensor, boxes, boxes_ind, crop_size)
 
 
-# (points 2, 4, 6, 7); Returns a list of image paths
+# (points 2, 4, 6, 7)
 def run_model(image_paths, model):
     image_list = []
     paths = []
@@ -76,45 +72,16 @@ def run_model(image_paths, model):
         image_list.extend(augmented_images)
 
     # this line is a mess, feel free to break it down into multiple lines for readability
-    scores = model.predict_on_batch(create_tensor(np.asarray(image_list))).numpy()
+    scores = model.predict_on_batch(create_tensor(np.asarray(image_list)))
 
-    return fetch_best_images(paths, scores)
+    return generate_dict(paths, image_list, scores)
 
 
-# returns a list of image paths
-def fetch_best_images(paths, scores):
+def generate_dict(paths, arrays, scores):
     image_dicts = []
     for index in range(len(paths)):
-        image_dicts.append({'path': paths[index], 'score': scores[index]})
+        image_dicts.append({'path': paths[index], 'np_array': arrays[index], 'score': scores[index]})
 
     # top 5 images:
     sorted_dict = sorted(image_dicts, key=lambda i: i['score'], reverse=True)
-    sorted_dict = sorted_dict[:5]
-
-    required_paths = [sub['path'] for sub in sorted_dict]
-    return required_paths
-
-
-@app.route('/')
-def show_index():
-    return render_template('index.html')
-
-
-@app.route('/uploads/<filename>')
-def send_file(filename):
-    return send_from_directory(r'E:\Projects\team7\app\uploads', filename)
-
-
-@app.route('/', methods=['POST'])
-def results():
-    print(request.files.getlist('img'))
-    if request.method == 'POST':
-        # write your function that loads the model
-        model = get_model()
-        image_paths = get_images(request.files)
-        top5 = run_model(image_paths, model)
-        return render_template('result.html', images=top5)
-
-
-app.run("localhost", 9999, debug=True)
-
+    return sorted_dict[:5]
