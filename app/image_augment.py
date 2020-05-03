@@ -30,10 +30,10 @@ class ImageAugment():
     def adjust_saturation(self, alpha):
         temp_hsv = self.image_hsv.astype('float32')
         (h, s, v) = cv2.split(temp_hsv)
-        s=s+(255-s)*alpha
-        s=np.clip(s, 0, 255)
+        s=s+(255-s)*alpha**3
+        s = np.clip(s, 1, 254)
         imghsv = cv2.merge([h,s,v])
-        imghsv = cv2.cvtColor(imghsv.astype('uint8'), cv2.COLOR_HSV2RGB)
+        imghsv = cv2.cvtColor(imghsv.astype("uint8"), cv2.COLOR_HSV2RGB)
         return imghsv
 
     def adjust_sharpness(self, alpha):
@@ -43,16 +43,14 @@ class ImageAugment():
 
     def adjust_warmth(self, alpha, cool=False):
         (r, g, b) = cv2.split(self.image_rgb)
-        increaseLUT = np.array([i + (255 - i) * alpha for i in np.arange(0, 256)])
-        decreaseLUT = np.array([i * alpha for i in np.arange(0, 256)])
         if not cool:
-            r = cv2.LUT(r, decreaseLUT)
-            b = cv2.LUT(b, increaseLUT)
+            r = r*(1-alpha**2)
+            b = b+(255-b)*alpha**2
         else:
-            r = cv2.LUT(r, increaseLUT)
-            b = cv2.LUT(b, decreaseLUT)
+            r = r+(255-r)*alpha**2
+            b = b*(1-alpha**2)
         image_new = np.zeros_like(self.image_rgb)
-        image_new[:,:,0] = r
+        image_new[:, :, 0] = r
         image_new[:, :, 1] = g
         image_new[:, :, 2] = b
 
@@ -62,9 +60,9 @@ class ImageAugment():
         return self.adjust_warmth(alpha, cool)
 
     def augment(self):
-        images = [self.adjust_brightness(.7), self.adjust_brightness(2), self.adjust_contrast(alpha=2, beta=3),
-                  self.adjust_saturation(.3), self.adjust_saturation(-.3), self.adjust_sharpness(.4),
-                  self.adjust_sharpness(-.4), self.adjust_warmth(.0001), self.adjust_cool(.000001)]
+        images = [self.adjust_brightness(.8), self.adjust_brightness(1.7), self.adjust_contrast(alpha=2, beta=3),
+                  self.adjust_saturation(.5), self.adjust_saturation(-.5), self.adjust_sharpness(.3),
+                  self.adjust_sharpness(-.3), self.adjust_warmth(.4), self.adjust_cool(.4)]
         self.save_images(images)
         return images
 
