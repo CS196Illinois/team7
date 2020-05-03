@@ -60,16 +60,9 @@ class ImageAugment():
         self.adjust_warmth(alpha, cool)
 
     def augment(self):
-        images = []
-        images.append(self.adjust_brightness(.7))
-        images.append(self.adjust_brightness(2))
-        images.append(self.adjust_contrast(alpha=2, beta=3))
-        images.append(self.adjust_saturation(.3))
-        images.append(self.adjust_saturation(-.3))
-        images.append(self.adjust_sharpness(.4))
-        images.append(self.adjust_sharpness(-.4))
-        images.append(self.adjust_warmth(.0001))
-        images.append(self.adjust_cool(.000001))
+        images = [self.adjust_brightness(.7), self.adjust_brightness(2), self.adjust_contrast(alpha=2, beta=3),
+                  self.adjust_saturation(.3), self.adjust_saturation(-.3), self.adjust_sharpness(.4),
+                  self.adjust_sharpness(-.4), self.adjust_warmth(.0001), self.adjust_cool(.000001)]
         return images
         
         

@@ -16,18 +16,14 @@ app = Flask('image_optimizer')
 
 UPLOAD_FOLDER = r'E:\Projects\team7\app'
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
 def get_model():
     model = tf.keras.models.load_model('model_ver2.h5')
     return model
 
 
-def run_model(model, files):
-    # calls the augmenter
-    for image in files:
-        augmenter = ImageAugment(image)
-        # augmenter.augment()
-
-
+# returns a list of image paths (original images)
 def get_images(files):
     """converts request.files to an array of PIL images"""
     arr = []
@@ -39,21 +35,19 @@ def get_images(files):
         # image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
         # arr.append(image)
         arr.append("./uploads/"+str(value.filename))
-        return arr # TODO remove me
     return arr
 
-def create_tensor(images):
+
+def create_tensor(numpy_images):
     """converts an array of PIL images to a single
     4D tensor that is ready to be handled directly by the model"""
-    return cv2.imread(images[0]) # TODO remove me
-
     tensor = []
     boxes = []
-    for image in images:
-        img_tensor = tf.keras.preprocessing.image.img_to_array(image)
-        tensor.append(img_tensor)
-        center_x = len(img_tensor[0])/2
-        center_y = len(img_tensor)/2
+    for image in numpy_images:
+        # img_tensor = tf.keras.preprocessing.image.img_to_array(image)
+        tensor.append(image)
+        center_x = len(image[0])/2
+        center_y = len(image)/2
         distance = min(center_x, center_y)
         y1 = center_y - distance
         x1 = center_x - distance
@@ -66,8 +60,47 @@ def create_tensor(images):
     return tf.image.crop_and_resize(tensor, boxes, boxes_ind, crop_size)
 
 
+# (points 2, 4, 6, 7)
+def run_model(image_paths, model):
+    image_list = []
+    for path in image_paths:
+        image = Image.open(path)
+        # add in the original image
+        image_list.append(np.array(image))
+
+        augmenter = ImageAugment(image)
+        augmented_images = augmenter.augment()
+
+        # TODO: Call function to save augmented numpy images here
+
+        # add in the augmented images
+        for aug_img in augmented_images:
+            image_list.append(aug_img)
+
+    scores = model.predict_on_batch(image_list)
+
+    paths = [] # PLACEHOLDER
+    return generate_dict(paths, image_list, scores)
+
+
+# we have the
+def generate_dict(paths, arrays, scores):
+    image_dicts = []
+    for index in range(len(paths)):
+        image_dicts.append({'path': paths[index], 'np_array': arrays[index], 'score': scores[index]})
+
+    # top 5 images:
+    sorted_dict = sorted(image_dicts, key=lambda i: i['score'], reverse=True)
+    return sorted_dict[:5]
+
+
 def save_images(images):
     """ saves PIL images as .jpg's to be used by result.html """
+    # TODO: Replace code in this function with code to save numpy images maybe?
+
+    for image in images:
+        tf.keras.preprocessing.image.save_img()
+
     image_objects = []
     for image in images:
         # convert numpy array to PIL Image
@@ -90,6 +123,7 @@ def save_images(images):
 @app.route('/')
 def show_index():
     return render_template('index.html')
+
 
 @app.route('/uploads/<filename>')
 def send_file(filename):
