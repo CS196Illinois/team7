@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
-class ImageAugment():
+
+class ImageAugment:
     def __init__(self, image_rgb, filename):
         image_rgb = np.array(image_rgb)
         self.image_lab = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2LAB)
