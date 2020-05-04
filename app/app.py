@@ -69,7 +69,6 @@ def run_model(image_paths, model):
         # add to images
         image_list.append(np.array(image))
         image_list.extend(augmented_images)
-
     
     scores = model.predict_on_batch(create_tensor(np.asarray(image_list))).numpy()
 

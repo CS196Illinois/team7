@@ -78,7 +78,3 @@ class ImageAugment():
 
     def get_paths(self):
         return self.paths
-        
-        
-        
-        
