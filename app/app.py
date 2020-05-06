@@ -1,3 +1,5 @@
+import os
+import ntpath
 from flask import Flask, render_template, request, send_from_directory
 import numpy as np
 from PIL import Image
@@ -22,7 +24,7 @@ def get_model():
 def get_images(files):
     """converts request.files to an array of image paths"""
     arr = []
-    for key, value in files.items():
+    for value in files:
         value.save("./uploads/"+str(value.filename))
         arr.append("./uploads/"+str(value.filename))
     return arr
@@ -34,7 +36,8 @@ def run_model(image_paths, model):
     paths = []
     for path in image_paths:
         image = Image.open(path)
-
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
         augmenter = ImageAugment(image, path)
         augmented_images = augmenter.augment()
         augmented_paths = augmenter.get_paths()
@@ -102,7 +105,7 @@ def results():
     if request.method == 'POST':
         # called when user hits submit
         model = get_model()
-        image_paths = get_images(request.files)
+        image_paths = get_images(request.files.getlist('img'))
         top5 = run_model(image_paths, model)
         return render_template('result.html', images=top5)
 
