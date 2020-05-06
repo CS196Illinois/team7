@@ -11,6 +11,6 @@ The Image Optimizer allows the user to load a set of images into our model, whic
 * [Pillow 7.1.2](https://pypi.org/project/Pillow/)
 * [opencv-python 4.2.0.34](https://pypi.org/project/opencv-python/)
 
-Once you run the application, it will be hosted on (http://localhost:9999/), which you can access from your browser. You may upload as many images as you want. The model takes time to run, so you will need to wait for a short period of time to get the results. 
+Once you run the application, it will be hosted on http://localhost:9999/, which you can access from your browser. You may upload as many images as you want. The model takes time to run, so you will need to wait for a short period of time to get the results. 
 
 We believe that the Image Optimizer will help ensure people can stay in the moment and spend less time worrying about selecting and editing the picture to be the best it can be. 
