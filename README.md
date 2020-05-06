@@ -1,6 +1,7 @@
 # Image Optimizer
 
-Authors: Aileen Long, Ishita Rao, Reece Anderson
+**Authors:** Aileen Long, Ishita Rao, Reece Anderson
+
 ---
 
 An image optimizer targeted at maximising the number of likes you could get on social media.
