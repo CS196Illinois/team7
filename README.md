@@ -1,4 +1,8 @@
 # Image Optimizer
+
+Authors: Aileen Long, Ishita Rao, Reece Anderson
+---
+
 An image optimizer targeted at maximising the number of likes you could get on social media.
 
 The Image Optimizer allows the user to load a set of images into our model, which will then generate augmented versions of the original images. The best of these augmented images will be returned to the user to share with friends and family.
