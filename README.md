@@ -19,7 +19,8 @@ The Image Optimizer allows the user to load a set of images into our model, whic
 * [opencv-python 4.2.0.34](https://pypi.org/project/opencv-python/)
 
 ### Models
-
+* unpruned model: https://drive.google.com/file/d/19u1gfC5yMD3xnbk7yBuLEAmu9bfkB4zq/view?usp=sharing
+* pruned model: https://drive.google.com/file/d/1-FO5C8Pi-RDbYNlAEpTIiLdz9jwSYP1b/view?usp=sharing
 
 Once you run the application, it will be hosted on http://localhost:9999/, which you can access from your browser. You may upload as many images as you want. The model takes time to run, so you will need to wait for a short period of time to get the results. 
 
