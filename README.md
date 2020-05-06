@@ -6,6 +6,8 @@
 
 An image optimizer targeted at maximising the number of likes you could get on social media.
 
+**Note:** Before running the application, be sure to change UPLOAD_FOLDER in app.py. It depends on your OS, but it should be an absolute path to team7/app/uploads. You can obtain this path by right-clicking the uploads folder and selecting 'Get Info' or 'Properties'.
+
 The Image Optimizer allows the user to load a set of images into our model, which will then generate augmented versions of the original images. The best of these augmented images will be returned to the user to share with friends and family.
 
 ### Dependencies
