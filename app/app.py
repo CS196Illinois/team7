@@ -5,13 +5,11 @@ import tensorflow as tf
 
 from image_augment import ImageAugment
 
-# YOU NEED TF 2.1.0, CV2 4.2.0.34, and PROTOBUF 3.11.3!!!
-# You also need pillow and opencv-python
 # RUN IT INSIDE APP DIRECTORY
 
 app = Flask('image_optimizer')
 
-UPLOAD_FOLDER = r'/Users/ishita/team7/app/uploads'
+UPLOAD_FOLDER = r'/Users/ishita/team7/app/uploads'  # USERS: CHANGE THIS
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
@@ -28,6 +26,30 @@ def get_images(files):
         value.save("./uploads/"+str(value.filename))
         arr.append("./uploads/"+str(value.filename))
     return arr
+
+
+# Returns a list of image paths
+def run_model(image_paths, model):
+    image_list = []
+    paths = []
+    for path in image_paths:
+        image = Image.open(path)
+
+        augmenter = ImageAugment(image, path)
+        augmented_images = augmenter.augment()
+        augmented_paths = augmenter.get_paths()
+
+        # add to paths
+        paths.append(path)
+        paths.extend(augmented_paths)
+
+        # add to images
+        image_list.append(np.array(image))
+        image_list.extend(augmented_images)
+
+    scores = model.predict_on_batch(create_tensor(np.asarray(image_list))).numpy()
+
+    return fetch_best_images(paths, scores)
 
 
 def create_tensor(numpy_images):
@@ -51,30 +73,6 @@ def create_tensor(numpy_images):
     return tf.image.crop_and_resize(tensor, boxes, boxes_ind, crop_size)
 
 
-# Returns a list of image paths
-def run_model(image_paths, model):
-    image_list = []
-    paths = []
-    for path in image_paths:
-        image = Image.open(path)
-
-        augmenter = ImageAugment(image, path)
-        augmented_images = augmenter.augment()
-        augmented_paths = augmenter.get_paths()
-
-        # add to paths
-        paths.append(path)
-        paths.extend(augmented_paths)
-
-        # add to images
-        image_list.append(np.array(image))
-        image_list.extend(augmented_images)
-    
-    scores = model.predict_on_batch(create_tensor(np.asarray(image_list))).numpy()
-
-    return fetch_best_images(paths, scores)
-
-
 # returns a list of image paths
 def fetch_best_images(paths, scores):
     image_dicts = []
@@ -96,7 +94,7 @@ def show_index():
 
 @app.route('/uploads/<filename>')
 def send_file(filename):
-    return send_from_directory(r'/Users/ishita/team7/app/uploads', filename)
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 
 @app.route('/', methods=['POST'])
