@@ -11,7 +11,7 @@ An image optimizer targeted at maximising the number of likes you could get on s
 The Image Optimizer allows the user to load a set of images into our model, which will then generate augmented versions of the original images. The best of these augmented images will be returned to the user to share with friends and family.
 
 ### Dependencies
-* The trained [model](https://drive.google.com/file/d/1-2wrpw22OGTGf5q3TIDZ_gN_n8GQTBDY/view?usp=sharing). It was trained on thousands of popular Instagram images.
+* The trained models (see below). They were trained on thousands of popular Instagram images.
 * [Flask](https://pypi.org/project/Flask/)
 * [Tensorflow 2.1.0](https://pypi.org/project/tensorflow/)
 * [NumPy](https://pypi.org/project/numpy/)
